@@ -1,0 +1,30 @@
+# Folders
+build/
+out/
+discord/
+
+
+# IDE specific files
+*.cbp
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+*.idea/
+*.vs/
+
+# Executables and libraries
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+
+# Other files that may be generated
+*.stackdump
+*.log
+*.swp
+*~
+
+
