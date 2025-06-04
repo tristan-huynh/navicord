@@ -1,7 +1,7 @@
 # Folders
 build/
 out/
-discord/
+lib/
 
 
 # IDE specific files
@@ -12,6 +12,7 @@ discord/
 *.user
 *.idea/
 *.vs/
+*.vscode/
 
 # Executables and libraries
 *.exe

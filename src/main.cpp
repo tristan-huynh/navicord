@@ -4,16 +4,12 @@
 #include <thread>
 #include <chrono>
 
-#include "../discord/header/discord.h"
-#include "fmanager.h"
+#include "../lib/discord_game_sdk/include/discord.h"
+#include "fmanager.hpp"
+#include "nrestclient.hpp"
+
 
 using namespace std;
-
-#ifdef DEBUG_MODE
-#define DEBUG(msg) cerr << "DEBUG: " << msg << endl;
-#else
-#define DEBUG(msg)
-#endif
 
 namespace {
 	volatile bool interrupted = false;
@@ -26,13 +22,18 @@ struct DiscordState
 };
 
 
-const uint64_t APP_ID = 1377436019292504146;
+//const uint64_t APP_ID = 1377436019292504146;
 
 int main(int, char**)
 {	
-	fmanager filemanager("./config.yaml");
+	fmanager filemanager("../config.yaml");
 	filemanager.parseYAML();
 
+	const uint64_t APP_ID = std::stoull(filemanager.getValue("app_id"));
+	string baseUrl = filemanager.getValue("base_url");
+	string username = filemanager.getValue("username");
+	string password = filemanager.getValue("password");
+	nrestclient apiClient(baseUrl, username, password);
 
 	discord::Core* core{};
 	auto result = discord::Core::Create(APP_ID, DiscordCreateFlags_Default, &core);
@@ -46,11 +47,19 @@ int main(int, char**)
 		});
 
 	discord::Activity activity{};
-	activity.SetState("Using Navicord");
-	activity.SetDetails("Developed by Navicord Team");
-	//activity.GetAssets().SetLargeImage("navicord_large_image");
-	//activity.GetAssets().SetLargeText("Navicord - A Discord Client for Navigation");
-	activity.SetType(discord::ActivityType::Playing);
+	activity.SetName("Listening to Navicord");
+	activity.SetDetails("Song name");
+	if (apiClient.getAlbumArtUrl().compare("none") == 0) {
+		activity.GetAssets().SetLargeImage("navidrome-512");
+		activity.GetAssets().SetLargeText("Navicord - A Discord Client for Navigation");
+
+	} else {
+		activity.GetAssets().SetLargeImage(apiClient.getAlbumArtUrl().c_str());
+		activity.GetAssets().SetLargeText("Navicord - A Discord Client for Navigation");
+		activity.GetAssets().SetSmallImage("navidrome-512");
+		activity.GetAssets().SetSmallText("Navicord");
+	}
+	activity.SetType(discord::ActivityType::Listening);
 
 	discordCore->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
 		std::cout << ((result == discord::Result::Ok) ? "Rich presence updated\n" : "Failed updating rich presence.\n");

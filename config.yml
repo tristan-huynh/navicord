@@ -1,5 +1,5 @@
-music-server: http://music.dc01.tramhammer.org:4533 # Include port number if needed
-music-server-username: admin # Username for the music server
-music-server-password: password # Password for the music server
-music-server-ssl: false # Set to true if the music server uses SSL
-discord-client-id: 123456789012345678 # Your Discord application client ID
+serverurl: http://music.dc01.tramhammer.org:4533 # Include port number if needed
+serverusername: admin # Username for the music server
+serverpassword: password # Password for the music server
+serverssl: false # Set to true if the music server uses SSL
+appid: 1377436019292504146 # Your Discord application client ID
