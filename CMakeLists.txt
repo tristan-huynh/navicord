@@ -6,33 +6,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-# Add dependencies
-include(FetchContent)
-
-# CPR
-FetchContent_Declare(
-  cpr
-  GIT_REPOSITORY https://github.com/libcpr/cpr.git
-  GIT_TAG        1.11.2
-)
-set(CPR_BUILD_TESTS OFF)
-FetchContent_MakeAvailable(cpr)
-
-# JSON
-FetchContent_Declare(
-  json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.12.0
-)
-FetchContent_MakeAvailable(json)
-
 # Gather main application sources
 file(GLOB MAIN_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 # Gather the Discord SDK source files and build them into a static library
 file(GLOB DISCORD_SOURCES "${PROJECT_SOURCE_DIR}/lib/discord_game_sdk/source/*.cpp")
-add_library(discord_sdk ${DISCORD_SOURCES})
+
+add_library(discord_sdk STATIC ${DISCORD_SOURCES})
+
+
 target_include_directories(discord_sdk PUBLIC "${PROJECT_SOURCE_DIR}/lib/discord_game_sdk/include")
+
+
+
+
 
 # Link the precompiled Discord SDK library to the discord_sdk target
 if(WIN32)
@@ -44,9 +31,7 @@ else() # Linux
 endif()
 
 # Build your main executable and link it with the discord_sdk library
-add_executable(navicord ${MAIN_SOURCES})
-target_link_libraries(navicord PRIVATE discord_sdk)
-target_link_libraries(navicord PRIVATE cpr::cpr nlohmann_json::nlohmann_json)
+add_executable(navicord src/main.cpp)
 
 # Set the runtime search path (RPATH) for Linux and macOS
 if(UNIX)

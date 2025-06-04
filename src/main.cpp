@@ -6,7 +6,7 @@
 
 #include "../lib/discord_game_sdk/include/discord.h"
 #include "fmanager.hpp"
-#include "nrestclient.hpp"
+//#include "nrestclient.hpp"
 
 
 using namespace std;
@@ -26,14 +26,15 @@ struct DiscordState
 
 int main(int, char**)
 {	
-	fmanager filemanager("../config.yaml");
-	filemanager.parseYAML();
+	fmanager fman("../config.yml");
+	fman.parseYAML();
 
-	const uint64_t APP_ID = std::stoull(filemanager.getValue("app_id"));
-	string baseUrl = filemanager.getValue("base_url");
-	string username = filemanager.getValue("username");
-	string password = filemanager.getValue("password");
-	nrestclient apiClient(baseUrl, username, password);
+	const uint64_t APP_ID = std::stoull(fman.getValue("appid"));
+	string baseUrl = fman.getValue("serverurl");
+	string username = fman.getValue("serverusername");
+	string password = fman.getValue("serverpassword");
+	//nrestclient apiClient(baseUrl, username, password);
+	cout << password << endl;
 
 	discord::Core* core{};
 	auto result = discord::Core::Create(APP_ID, DiscordCreateFlags_Default, &core);
@@ -46,19 +47,23 @@ int main(int, char**)
 		std::cerr << "Log(" << static_cast<uint32_t>(level) << "): " << message << "\n";
 		});
 
+	//auto currentTrack = apiClient.getCurrentTrack();
 	discord::Activity activity{};
-	activity.SetName("Listening to Navicord");
-	activity.SetDetails("Song name");
-	if (apiClient.getAlbumArtUrl().compare("none") == 0) {
-		activity.GetAssets().SetLargeImage("navidrome-512");
-		activity.GetAssets().SetLargeText("Navicord - A Discord Client for Navigation");
-
-	} else {
-		activity.GetAssets().SetLargeImage(apiClient.getAlbumArtUrl().c_str());
-		activity.GetAssets().SetLargeText("Navicord - A Discord Client for Navigation");
-		activity.GetAssets().SetSmallImage("navidrome-512");
-		activity.GetAssets().SetSmallText("Navicord");
-	}
+	//if (currentTrack.has_value()) {
+		// // Update activity details based on the current track.
+		// activity.SetDetails((std::string("Playing: ") + currentTrack->title).c_str());
+		// activity.GetAssets().SetLargeImage("navidrome-512");
+		// activity.GetAssets().SetLargeText((std::string("Now playing: ") + currentTrack->artist).c_str());
+		// activity.GetAssets().SetSmallImage("navidrome-512");
+		// activity.GetAssets().SetSmallText(currentTrack->album.c_str());
+	//} else {
+        // Fallback if no track is playing
+        activity.SetDetails("No track playing");
+        activity.GetAssets().SetLargeImage("navidrome-512");
+        activity.GetAssets().SetLargeText("Navicord");
+        // activity.GetAssets().SetSmallImage("navidrome-512");
+        // activity.GetAssets().SetSmallText("Navicord");
+    //}
 	activity.SetType(discord::ActivityType::Listening);
 
 	discordCore->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
