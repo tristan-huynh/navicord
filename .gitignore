@@ -29,3 +29,8 @@ lib/
 *~
 
 
+
+
+# Added by cargo
+
+/target
